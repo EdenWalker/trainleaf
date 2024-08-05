@@ -1,0 +1,9 @@
+
+#map { 
+  height: 500px; 
+border: 5px;
+border-style:ridge;
+justify-content:end;
+margin-right: 10px;
+}
+
