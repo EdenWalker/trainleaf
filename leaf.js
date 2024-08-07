@@ -7,7 +7,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-axios.get('LTAMRTStationExitGEOJSON.geoJSON')
+axios.get('LTAMRTStationExit.geoJSON')
   .then(response => {
     var geojsonData = response.data;
     L.geoJSON(geojsonData, {
