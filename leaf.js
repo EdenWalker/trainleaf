@@ -1,4 +1,4 @@
-let map = L.map('map').setView([1.3521, 103.8198], 11);
+let map = L.map('map').setView([1.3521, 103.8198], 13);
 
 
 // let map = L.map('map').setView([1.3521, 103.8198], 11);
@@ -137,17 +137,40 @@ axios.get('mrt/LTAMRTStationExit.geoJSON')
     }).addTo(map);
   })
   .catch(error => console.error('Error loading GeoJSON data:', error));
-
   function fetchBusStops() {
+    // Fetch local JSON file
+    fetch('bus/BusStops.json')  // Adjust the path if necessary
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Process the data and add markers
+        var busStops = data.value;
+        busStops.forEach(function(stop) {
+          L.marker([stop.Latitude, stop.Longitude])
+            .addTo(map)
+            .bindPopup(`<b>${stop.Description}</b><br>${stop.RoadName}`);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }
+  
+  // Fetch bus stops and add markers
+  fetchBusStops();
+
+  function fetchBusStops2() {
     fetch('http://datamall2.mytransport.sg/ltaodataservice/BusStops', {
       headers: {
-        'AccountKey': 'LI8D5j1CQYmo+ZwU5QdGtg==',  // Replace with your actual account key if needed
+        'AccountKey': 'LI8D5j1CQYmo+ZwU5QdGtg==', // Replace with your actual account key if needed
         'accept': 'application/json'
       }
     })
     .then(response => response.json())
     .then(data => {
-      // Process the data and add markers
+      // Process the data and add markers to the map
       var busStops = data.value;
       busStops.forEach(function(stop) {
         L.marker([stop.Latitude, stop.Longitude])
@@ -157,6 +180,28 @@ axios.get('mrt/LTAMRTStationExit.geoJSON')
     })
     .catch(error => console.error('Error fetching data:', error));
   }
-
+  
   // Fetch bus stops and add markers
-  fetchBusStops();
+  fetchBusStops2();
+  // function fetchBusStops() {
+  //   fetch('http://datamall2.mytransport.sg/ltaodataservice/BusStops', {
+  //     headers: {
+  //       'AccountKey': 'LI8D5j1CQYmo+ZwU5QdGtg==',  // Replace with your actual account key if needed
+  //       'accept': 'application/json'
+  //     }
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     // Process the data and add markers
+  //     var busStops = data.value;
+  //     busStops.forEach(function(stop) {
+  //       L.marker([stop.Latitude, stop.Longitude])
+  //         .addTo(map)
+  //         .bindPopup(`<b>${stop.Description}</b><br>${stop.RoadName}`);
+  //     });
+  //   })
+  //   .catch(error => console.error('Error fetching data:', error));
+  // }
+
+  // // Fetch bus stops and add markers
+  // fetchBusStops();
