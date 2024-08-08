@@ -87,7 +87,7 @@ function extractAttributes(description) {
 }
 
 // Fetch and display GeoJSON data for MRT stations
-axios.get('merged.geoJSON')
+axios.get('LTAMRTStationExit.geoJSON')
   .then(response => {
     const geojsonData = response.data;
 
@@ -115,26 +115,26 @@ axios.get('merged.geoJSON')
   })
   .catch(error => console.error('Error loading GeoJSON data:', error));
 
-  // axios.get('merged.geoJSON')
-  // .then(response => {
-  //   console.log(response.data); // Debug: Check the structure of the GeoJSON data
-  //   var geojsonData = response.data;
-  //   L.geoJSON(geojsonData, {
-  //     onEachFeature: function (feature, layer) {
-  //       console.log(feature.properties); // Debug: Check the properties of each feature
-  //       if (feature.properties && feature.properties.STN_NAM_DE) {
-  //         layer.bindPopup(feature.properties.STN_NAM_DE);
-  //       }
-  //     },
-  //     style: function (feature) {
-  //       return {
-  //         fillColor: "#ff0000",
-  //         color: "#ff0000",
-  //         weight: 2,
-  //         opacity: 1
-  //       };
-  //     }
-  //   }).addTo(map);
-  // })
-  // .catch(error => console.error('Error loading GeoJSON data:', error));
+  axios.get('ProcessedGeoJSON.geoJSON')
+  .then(response => {
+    console.log(response.data); // Debug: Check the structure of the GeoJSON data
+    var geojsonData = response.data;
+    L.geoJSON(geojsonData, {
+      onEachFeature: function (feature, layer) {
+        console.log(feature.properties); // Debug: Check the properties of each feature
+        if (feature.properties && feature.properties.STN_NAM_DE) {
+          layer.bindPopup(feature.properties.STN_NAM_DE);
+        }
+      },
+      style: function (feature) {
+        return {
+          fillColor: "#ff0000",
+          color: "#ff0000",
+          weight: 2,
+          opacity: 1
+        };
+      }
+    }).addTo(map);
+  })
+  .catch(error => console.error('Error loading GeoJSON data:', error));
 
