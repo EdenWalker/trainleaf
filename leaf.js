@@ -87,7 +87,7 @@ function extractAttributes(description) {
 }
 
 // Fetch and display GeoJSON data for MRT stations
-axios.get('LTAMRTStationExit.geoJSON')
+axios.get('mrt/LTAMRTStationExit.geoJSON')
   .then(response => {
     const geojsonData = response.data;
 
@@ -115,7 +115,7 @@ axios.get('LTAMRTStationExit.geoJSON')
   })
   .catch(error => console.error('Error loading GeoJSON data:', error));
 
-  axios.get('ProcessedGeoJSON.geoJSON')
+  axios.get('mrt/ProcessedGeoJSON.geoJSON')
   .then(response => {
     console.log(response.data); // Debug: Check the structure of the GeoJSON data
     var geojsonData = response.data;
@@ -138,3 +138,25 @@ axios.get('LTAMRTStationExit.geoJSON')
   })
   .catch(error => console.error('Error loading GeoJSON data:', error));
 
+  function fetchBusStops() {
+    fetch('http://datamall2.mytransport.sg/ltaodataservice/BusStops', {
+      headers: {
+        'AccountKey': 'LI8D5j1CQYmo+ZwU5QdGtg==',  // Replace with your actual account key if needed
+        'accept': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Process the data and add markers
+      var busStops = data.value;
+      busStops.forEach(function(stop) {
+        L.marker([stop.Latitude, stop.Longitude])
+          .addTo(map)
+          .bindPopup(`<b>${stop.Description}</b><br>${stop.RoadName}`);
+      });
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
+  // Fetch bus stops and add markers
+  fetchBusStops();
