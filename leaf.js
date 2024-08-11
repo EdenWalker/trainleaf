@@ -2,84 +2,86 @@ let map = L.map('map').setView([1.3521, 103.8198], 13);
 
 
 // let map = L.map('map').setView([1.3521, 103.8198], 11);
+
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 const iconMapping = {
-  "Exit A": "img/01.jpg",
-  "Exit B": "img/02.jpg",
-  "Exit C": "img/03.jpg",
-  "Exit D": "img/04.jpg",
-  "Exit E": "img/05.jpg",
-  "Exit F": "img/06.jpg",
-  "Exit G": "img/07.jpg",
-  "Exit H": "img/08.jpg",
-  "Exit I": "img/09.jpg",
-  "Exit J": ["img/01.jpg", "img/00.jpg"],
-  "Exit K": ["img/01.jpg", "img/01.jpg"],
-  "Exit L": ["img/01.jpg", "img/02.jpg"],
-  "Exit M": ["img/01.jpg", "img/03.jpg"],
-  "Exit 1": "img/01.jpg",
-  "Exit 2": "img/02.jpg",
-  "Exit 3": "img/03.jpg",
-  "Exit 4": "img/04.jpg",
-  "Exit 5": "img/05.jpg",
-  "Exit 6": "img/06.jpg",
-  "Exit 7": "img/07.jpg",
-  "Exit 8": "img/08.jpg",
-  "Exit 9": "img/09.jpg",
-  "Exit 10": ["img/01.jpg", "img/00.jpg"],
-  "Exit 11": ["img/01.jpg", "img/01.jpg"],
-  "Exit 12": ["img/01.jpg", "img/02.jpg"],
-  "Exit 13": ["img/01.jpg", "img/03.jpg"]
+  "Exit A": "img/A.png",
+  "Exit B": "img/B.png",
+  "Exit C": "img/C.png",
+  "Exit D": "img/D.png",
+  "Exit E": "img/E.png",
+  "Exit F": "img/F.png",
+  "Exit G": "img/G.png",
+  "Exit H": "img/H.png",
+  "Exit I": "img/I.png",
+  "Exit J": "img/J.png",
+  "Exit K": "img/K.png",
+  "Exit L": "img/J.png", 
+  "Exit M": "img/M.png", 
+  "Exit 1": "img/1.png",
+  "Exit 2": "img/2.png",
+  "Exit 3": "img/3.png",
+  "Exit 4": "img/4.png",
+  "Exit 5": "img/5.png",
+  "Exit 6": "img/6.png",
+  "Exit 7": "img/7.png",
+  "Exit 8": "img/8.png",
+  "Exit 9": "img/9.png",
+  "Exit 10": "img/10.png", 
+  "Exit 11": "img/11.png", 
+  "Exit 12": "img/12.png", 
+  "Exit 13": "img/13.png", 
 };
+// Create a marker cluster group
+let markerClusterLayer = L.markerClusterGroup({
+  maxClusterRadius: 60, 
+  disableClusteringAtZoom: 16 }
+);
 
 // Function to create custom icons
 function createCustomIcon(exitCode) {
   const images = iconMapping[exitCode];
   
-  // Create a div element for the custom marker
   const div = document.createElement('div');
   div.className = 'custom-icon';
   
-  // Add images to the div
   if (Array.isArray(images)) {
     images.forEach((src, index) => {
       const img = document.createElement('img');
       img.src = src;
       img.style.position = 'absolute';
       img.style.top = '0';
-      img.style.left = `${index * 20}px`; // Adjust position for overlap
+      img.style.left = `${index * 20}px`;
       div.appendChild(img);
     });
   } else {
-    // Single image case
     const img = document.createElement('img');
     img.src = images;
     div.appendChild(img);
   }
   
   return L.divIcon({
-    className: '', // No extra class
-    html: div.outerHTML, // Use the div's outerHTML for the custom icon
-    iconSize: [25, 25], // Size of the icon
-    iconAnchor: [12, 24], // Anchor point of the icon
-    popupAnchor: [0, -24] // Popup anchor point
+    className: '',
+    html: div.outerHTML,
+    iconSize: [25, 25],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -24]
   });
 }
 
-// Function to extract attributes from the description
+// Function to extract attributes from description
 function extractAttributes(description) {
-  // Extract station name and clean it
+  // Extract station name
   const stationNameMatch = description.match(/<th>STATION_NA<\/th>\s*<td>([^<]+)<\/td>/);
-  let stationName = stationNameMatch ? stationNameMatch[1] : "No Name";
-  stationName = stationName.replace(/ MRT STATION$/, ''); // Remove " MRT STATION" if present
-  
+  const stationName = stationNameMatch ? stationNameMatch[1].replace(/ MRT STATION$/, '') : "No Name";
+
   // Extract exit code
-  const exitCodeMatch = description.match(/<th>EXIT_CODE<\/th>\s*<td>(Exit [A-M]|Exit [1-9]|Exit 10|Exit 11|Exit 12|Exit 13)<\/td>/);
+  const exitCodeMatch = description.match(/<th>EXIT_CODE<\/th>\s*<td>(Exit [A-Z0-9]+)<\/td>/);
   const exitCode = exitCodeMatch ? exitCodeMatch[1] : "No Exit Code";
-  
+
   return {
     stationName,
     exitCode
@@ -90,38 +92,47 @@ function extractAttributes(description) {
 axios.get('mrt/LTAMRTStationExit.geoJSON')
   .then(response => {
     const geojsonData = response.data;
-
+console.log(response.data)
     L.geoJSON(geojsonData, {
       onEachFeature: function (feature, layer) {
+        console.log(feature.properties); 
         if (feature.properties) {
           let description = feature.properties.Description || "No Description";
           let { stationName, exitCode } = extractAttributes(description);
 
-          // Create popup content
           let popupContent = `<b>${stationName}</b><br>${exitCode}`;
           layer.bindPopup(popupContent);
         }
       },
       pointToLayer: function (feature, latlng) {
+        console.log(feature.properties.Description); 
         let description = feature.properties.Description || "No Description";
         let { exitCode } = extractAttributes(description);
         let icon = createCustomIcon(exitCode);
 
-        return L.marker(latlng, {
-          icon: icon
-        });
+        // Create and add marker to cluster layer
+        let marker = L.marker(latlng, { icon: icon });
+        markerClusterLayer.addLayer(marker);
       }
     }).addTo(map);
+
+    // Add marker cluster layer to map
+    map.addLayer(markerClusterLayer);
   })
   .catch(error => console.error('Error loading GeoJSON data:', error));
 
+
+// Function to extract attributes from the description
+
+
+
   axios.get('mrt/ProcessedGeoJSON.geoJSON')
   .then(response => {
-    console.log(response.data); // Debug: Check the structure of the GeoJSON data
+
     var geojsonData = response.data;
     L.geoJSON(geojsonData, {
       onEachFeature: function (feature, layer) {
-        console.log(feature.properties); // Debug: Check the properties of each feature
+       
         if (feature.properties && feature.properties.STN_NAM_DE) {
           layer.bindPopup(feature.properties.STN_NAM_DE);
         }
@@ -137,6 +148,11 @@ axios.get('mrt/LTAMRTStationExit.geoJSON')
     }).addTo(map);
   })
   .catch(error => console.error('Error loading GeoJSON data:', error));
+
+
+
+
+
   function fetchBusStops() {
     // Fetch local JSON file
     fetch('bus/BusStops.json')  // Adjust the path if necessary
@@ -161,28 +177,28 @@ axios.get('mrt/LTAMRTStationExit.geoJSON')
   // Fetch bus stops and add markers
   fetchBusStops();
 
-  function fetchBusStops2() {
-    fetch('http://datamall2.mytransport.sg/ltaodataservice/BusStops', {
-      headers: {
-        'AccountKey': 'LI8D5j1CQYmo+ZwU5QdGtg==', // Replace with your actual account key if needed
-        'accept': 'application/json'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Process the data and add markers to the map
-      var busStops = data.value;
-      busStops.forEach(function(stop) {
-        L.marker([stop.Latitude, stop.Longitude])
-          .addTo(map)
-          .bindPopup(`<b>${stop.Description}</b><br>${stop.RoadName}`);
-      });
-    })
-    .catch(error => console.error('Error fetching data:', error));
-  }
+  // function fetchBusStops2() {
+  //   fetch('http://datamall2.mytransport.sg/ltaodataservice/BusStops', {
+  //     headers: {
+  //       'AccountKey': 'LI8D5j1CQYmo+ZwU5QdGtg==', // Replace with your actual account key if needed
+  //       'accept': 'application/json'
+  //     }
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     // Process the data and add markers to the map
+  //     var busStops = data.value;
+  //     busStops.forEach(function(stop) {
+  //       L.marker([stop.Latitude, stop.Longitude])
+  //         .addTo(map)
+  //         .bindPopup(`<b>${stop.Description}</b><br>${stop.RoadName}`);
+  //     });
+  //   })
+  //   .catch(error => console.error('Error fetching data:', error));
+  // }
   
-  // Fetch bus stops and add markers
-  fetchBusStops2();
+  // // Fetch bus stops and add markers
+  // fetchBusStops2();
   // function fetchBusStops() {
   //   fetch('http://datamall2.mytransport.sg/ltaodataservice/BusStops', {
   //     headers: {
