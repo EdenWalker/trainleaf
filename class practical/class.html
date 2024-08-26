@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+     <!-- <link rel="stylesheet" href="styles.css"/> -->
+  <link rel="stylesheet" href="leaflet.css"/>
+  <title>intergrated bus and mrt mapping</title>
+</head>
+<body>
+
+
+  <div id="map"></div>
+  <h1>Train Line Data</h1>
+  <label for="train-line-select">Select Train Line:</label>
+    <select id="train-line-select">
+        <option value="CCL">Circle Line </option>
+        <option value="CEL">Circle Line Extension</option>
+        <option value="CCL+">Circle Line + Extension</option>
+        <option value="CGL">Changi Extension</option>
+        <option value="DTL">Downtown Line</option>
+        <option value="EWL">East West Line</option>
+        <option value="EWL+">East West Line + Extension</option>
+        <option value="NEL">North East Line</option>
+        <option value="NSL">North South Line</option>
+        <option value="BPL">Bukit Panjang LRT</option>
+        <option value="SLRT">Sengkang LRT</option>
+        <option value="PLRT">Punggol LRT</option>
+        <option value="SBST">SBST Stations</option> 
+        <option value="SMRT">SMRT Stations</option> 
+    </select>
+    <ul id="data-list"></ul>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+crossorigin=""></script>
+
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster-src.js"></script>
+<script src="leaf.js"></script>
+
+
+
+</body>
+</html>
